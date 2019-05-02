@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreAPI.Data.Contexts;
+using CoreAPI.Data.Repositories;
+using CoreAPI.Services.Interfaces;
+using CoreAPI.Services.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,6 +31,15 @@ namespace SpeedUpCoreAPIExample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddDbContext<MainContext>(options=>
+            options.UseSqlServer(Configuration.GetConnectionString("MainDatabase")));
+
+            services.AddScoped<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IPricesRepository, PricesRepository>();
+
+            services.AddTransient<IProductsService, ProductsService>();
+            services.AddTransient<IPricesService, PricesService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
